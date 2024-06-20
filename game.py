@@ -35,14 +35,7 @@ while running:
         del mapstage
         mapstage = maplevel.ProcMap()
         # TILESIZE = random.randint(2,60)
-    if keys[pygame.K_w]:
-        player.move(0,4)
-    if keys[pygame.K_s]:
-        player.move(0,-4)
-    if keys[pygame.K_a]:
-        player.move(4,0)
-    if keys[pygame.K_d]:
-        player.move(-4,0)
+    player.update()
     if keys[pygame.K_q]:
         running = False   
     if keys[pygame.K_f]:

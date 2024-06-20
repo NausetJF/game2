@@ -1,4 +1,7 @@
 
+import pygame
+
+
 class Position():
     def __init__(self,x,y):
             
@@ -18,7 +21,20 @@ class Player():
         
         pass
 
-
+    def update(self):
+        
+        keys = pygame.key.get_pressed()
+        
+        if keys[pygame.K_w]:
+            self.move(0,4)
+        if keys[pygame.K_s]:
+            self.move(0,-4)
+        if keys[pygame.K_a]:
+            self.move(4,0)
+        if keys[pygame.K_d]:
+            self.move(-4,0)
+    
+    
     def move(self,x,y):
         # print(x,y)
         IsMoving = x != 0 or y != 0

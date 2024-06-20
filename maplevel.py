@@ -2,7 +2,7 @@ import random
 import pygame
 from pythonperlin import perlin
 
-TILESIZE = 30
+TILESIZE = 50
 
 
 
@@ -91,7 +91,14 @@ class ProcMap():
         return newcolor
     
     
-    def draw(self,hideUnseen = True):
+    def draw(self,screen,hideUnseen = True):
         #unimplemented
+        count = 0
+        screenarea = screen.get_rect()
+        for tile in self.tiles.sprites():
+            if screenarea.colliderect(tile):
+                screen.blit(tile.image,tile.rect)
+                count += 1
+        print("tiles rendered:", count)
         
         
