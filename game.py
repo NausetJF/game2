@@ -51,6 +51,9 @@ while running:
     
     # print(keys)
     # print(player.position.x,player.position.y)
+    
+    
+    #moving the camera 
     for tile in mapstage.tiles.sprites():
         tile.move(player.velocity.x,player.velocity.y)
     
@@ -62,8 +65,8 @@ while running:
     
     
     
+    mapstage.draw(screen)
     
-    mapstage.tiles.draw(screen)
     pygame.display.flip()
     
     # clock.tick(60)

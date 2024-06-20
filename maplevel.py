@@ -89,3 +89,9 @@ class ProcMap():
         newb = abs(int(newb)) % 255
         newcolor = (newr,newg,newb)
         return newcolor
+    
+    
+    def draw(self,hideUnseen = True):
+        #unimplemented
+        
+        
