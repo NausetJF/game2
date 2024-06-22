@@ -1,4 +1,4 @@
-import maplevel
+import map_levels
 import pygame
 
 

@@ -1,5 +1,5 @@
 import player
-import maplevel
+import map_levels
 
 import pygame
 import random
@@ -14,7 +14,7 @@ clock = pygame.time.Clock()
 running = True
 
 
-mapstage = maplevel.ProcMap()
+mapStage = map_levels.ProcMap()
 player = player.Player() 
 
 
@@ -32,13 +32,13 @@ while running:
     keys = pygame.key.get_pressed()
     
     if keys[pygame.K_r]:
-        del mapstage
-        mapstage = maplevel.ProcMap()
-        while (pygame.sprite.spritecollideany(player,mapstage.tiles())):
-            mapstage = maplevel.ProcMap()
+        del mapStage
+        mapStage = map_levels.ProcMap()
+        while (pygame.sprite.spritecollideany(player.body,mapStage.tiles)):
+            mapStage = map_levels.ProcMap()
         
         # TILESIZE = random.randint(2,60)
-    player.update(mapstage)
+    player.update(mapStage)
     if keys[pygame.K_q]:
         running = False   
     if keys[pygame.K_f]:
@@ -50,9 +50,11 @@ while running:
     
     
     #moving the camera 
-    for tile in mapstage.tiles.sprites():
+    for tile in mapStage.tiles.sprites():
         tile.move(player.velocity.x,player.velocity.y)
-    for tile in mapstage.backgroundTiles.sprites():
+    for tile in mapStage.backgroundTiles.sprites():
+        tile.move(player.velocity.x,player.velocity.y)
+    for tile in mapStage.offloadedTiles.sprites():
         tile.move(player.velocity.x,player.velocity.y)
     
     
@@ -63,11 +65,12 @@ while running:
     
     
     
-    mapstage.draw(screen,player)
+    mapStage.updates(screen)
+    mapStage.draw(screen,player)
     
     pygame.display.flip()
     
-    # clock.tick(60)
+    clock.tick(60*2)
     
     
     pass
