@@ -6,14 +6,14 @@ TILESIZE = 50
 
 
 
-def randomcolor():
+def randomColor():
     r = random.randint(0,255)
     g = random.randint(0,255)
     b = random.randint(0,255)
     color = (r,g,b)
     return color
     
-class ProcMap():
+class ProceduralMap():
     
     
     def __init__(self,seed = 0):
@@ -22,9 +22,9 @@ class ProcMap():
         self.offloadedTiles = pygame.sprite.Group()
 
         
-        self.color1 = randomcolor()
+        self.color1 = randomColor()
         # print(color1)
-        self.color2 = randomcolor()
+        self.color2 = randomColor()
         self.generateTile(self.color1, self.color2)
         
             
@@ -39,7 +39,7 @@ class ProcMap():
         self.deny = 10
         self.dens = 6
         self.octaves = 3
-        noise = self.perlinGen(self.denx, self.deny, self.dens, self.octaves) 
+        noise = self.generatePerlin(self.denx, self.deny, self.dens, self.octaves) 
         for row in noise:
             x = starx
             for cell in row:
@@ -47,9 +47,38 @@ class ProcMap():
                 x += 1
             y += 1
         
-        
+        self.generateGlobalRect()
 
-    def perlinGen(self, denx, deny, dens, octaves):
+    
+    def generateGlobalRect(self):
+        x,y = -1000000,-1000000
+        x2,y2 = 1000000,1000000
+        
+        for tile in self.tiles.sprites():
+            positionx = tile.rect.centerx
+            positiony = tile.rect.centerx
+            if positionx > x:
+                x = positionx
+            if positionx > x2:
+                x2 = positionx
+        
+            if positiony > y:
+                y = positiony
+            if positiony > y2:
+                y2 = positiony
+        
+        x2 = x2 - x
+        y2 = y2 - y
+
+
+        self.globalRect = pygame.rect.Rect(x,y,x2,y2)
+
+
+        pass
+
+
+
+    def generatePerlin(self, denx, deny, dens, octaves):
         noise = perlin((denx,deny),dens=dens,octaves=octaves)*255+255/2
         return noise
 
@@ -104,6 +133,8 @@ class ProcMap():
                     self.tiles.add(tile)
                     self.offloadedTiles.remove(tile)
         print("Offloaded: ",len(self.offloadedTiles.sprites()))
+        if screenarea.colliderect(self.globalRect):
+            self.generateTile(self.color1, self.color2,0,-40)
         pass
 
     

@@ -14,7 +14,7 @@ clock = pygame.time.Clock()
 running = True
 
 
-mapStage = map_levels.ProcMap()
+mapStage = map_levels.ProceduralMap()
 player = player.Player() 
 
 
@@ -33,9 +33,9 @@ while running:
     
     if keys[pygame.K_r]:
         del mapStage
-        mapStage = map_levels.ProcMap()
+        mapStage = map_levels.ProceduralMap()
         while (pygame.sprite.spritecollideany(player.body,mapStage.tiles)):
-            mapStage = map_levels.ProcMap()
+            mapStage = map_levels.ProceduralMap()
         
         # TILESIZE = random.randint(2,60)
     player.update(mapStage)
