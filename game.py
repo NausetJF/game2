@@ -62,7 +62,7 @@ while running:
     
     
     
-    
+     
     screen.fill("black")
     
     
@@ -73,6 +73,14 @@ while running:
     for thing in entities:
         screen.blit(thing.image,thing.rect)
     pygame.display.flip()
+
+    hudfont = pygame.font.SysFont(None,size=50,bold=True,italic=True)
+    MapName = mapStage.name
+    hudimg = hudfont.render(MapName,True,"white","black")
+
+
+    screen.blit(hudimg,(10,10))
+
     
     clock.tick(60*2)
     

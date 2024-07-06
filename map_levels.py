@@ -2,7 +2,7 @@ import random
 import pygame
 from pythonperlin import perlin
 from tile import *
-TILESIZE = 50
+TILESIZE = 200
 
 
 
@@ -27,9 +27,26 @@ class ProceduralMap():
         self.color2 = randomColor()
         self.generateTile(self.color1, self.color2)
         
-            
+        self.name = self.generateWorldName()
+        self.atmosphereColor = randomColor()
+        self.nightColor = randomColor()
+        self.dayduration = random.randint(10,500)
+        self.size = random.randint(100,1000)
         
         pass
+    
+
+    def generateWorldName(self):
+        firstsyl = ["end","wilt","bark","fire","fawn","aura"]
+        secondsyl = ["er","or","e","a"]
+        endsyl = ["ian","wood","town"]
+        sylables = random.randint(2,3)
+        if sylables == 2:
+            name = random.choice(firstsyl)+random.choice(endsyl)
+        else:
+            name = random.choice(firstsyl)+random.choice(secondsyl)+random.choice(endsyl)
+        return name
+
 
     def generateTile(self, color1, color2,starx=0,stary=0):
         x = starx
@@ -155,4 +172,4 @@ class ProceduralMap():
         
         pass
 
-        
+# print(ProceduralMap.generateName(self=None))
