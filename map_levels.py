@@ -35,8 +35,8 @@ class ProceduralMap():
         x = starx
         y = stary
         
-        self.denx = 10
-        self.deny = 10
+        self.denx = 20
+        self.deny = 20
         self.dens = 6
         self.octaves = 3
         noise = self.generatePerlin(self.denx, self.deny, self.dens, self.octaves) 
@@ -46,37 +46,9 @@ class ProceduralMap():
                 self.buildTile(color1, color2, x, y, cell)
                 x += 1
             y += 1
-        
-        self.generateGlobalRect()
 
     
-    def generateGlobalRect(self):
-        x,y = -1000000,-1000000
-        x2,y2 = 1000000,1000000
-        
-        for tile in self.tiles.sprites():
-            positionx = tile.rect.centerx
-            positiony = tile.rect.centerx
-            if positionx > x:
-                x = positionx
-            if positionx > x2:
-                x2 = positionx
-        
-            if positiony > y:
-                y = positiony
-            if positiony > y2:
-                y2 = positiony
-        
-        x2 = x2 - x
-        y2 = y2 - y
-
-
-        self.globalRect = pygame.rect.Rect(x,y,x2,y2)
-
-
-        pass
-
-
+    
 
     def generatePerlin(self, denx, deny, dens, octaves):
         noise = perlin((denx,deny),dens=dens,octaves=octaves)*255+255/2
@@ -123,18 +95,38 @@ class ProceduralMap():
         
         screenarea = screen.get_rect()
         print(screenarea)
+            # lasttile = self.offloadedTiles.sprites()[0]
         for tile in self.offloadedTiles.sprites():
             if screenarea.colliderect(tile):
                 print("Collision")
                 if type(tile) == BackgroundTile:
+                    # lasttile = tile
                     self.backgroundTiles.add(tile)
                     self.offloadedTiles.remove(tile)
                 if type(tile) == Tile:
+                    # lasttile = tile
                     self.tiles.add(tile)
                     self.offloadedTiles.remove(tile)
+            # else:
+            #     lastilex = lasttile.rect.centerx
+            #     lastiley = lasttile.rect.centery
+            #     positionx = screenarea.centerx
+            #     positiony = screenarea.centery
+
+            #     directionx = positionx - lastilex
+            #     directiony = positiony - lastiley
+            #     if directionx > directiony:
+            #         directiony = 0
+            #         self.generateTile(self.color1,self.color2,40,0)
+            #     if directiony > directionx:
+            #         directionx = 0
+            #         self.generateTile(self.color1,self.color2,0,40)
+                
+            #     pass
         print("Offloaded: ",len(self.offloadedTiles.sprites()))
-        if screenarea.colliderect(self.globalRect):
-            self.generateTile(self.color1, self.color2,0,-40)
+        # if not screenarea.colliderect(self.globalRect):
+        #     print("Outside")
+        #     self.generateTile(self.color1, self.color2,0,-40)
         pass
 
     

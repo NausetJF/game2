@@ -6,17 +6,17 @@ import random
 import gc
 from pythonperlin import perlin
 # import colour
-
+import otherentities
 pygame.init()
 
 screen = pygame.display.set_mode((1280,720))
 clock = pygame.time.Clock()
 running = True
 
-
 mapStage = map_levels.ProceduralMap()
 player = player.Player() 
-
+entity = otherentities.Entity(50,50)
+entities = [entity]
 
 while running: 
     
@@ -56,6 +56,9 @@ while running:
         tile.move(player.velocity.x,player.velocity.y)
     for tile in mapStage.offloadedTiles.sprites():
         tile.move(player.velocity.x,player.velocity.y)
+    for thing in entities:
+        thing.move(player.velocity.x,player.velocity.y)
+        screen.blit(thing.image,thing.rect)
     
     
     
@@ -67,7 +70,8 @@ while running:
     
     mapStage.updates(screen)
     mapStage.draw(screen,player)
-    
+    for thing in entities:
+        screen.blit(thing.image,thing.rect)
     pygame.display.flip()
     
     clock.tick(60*2)
