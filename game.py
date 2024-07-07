@@ -88,7 +88,7 @@ while running:
 
     screen.blit(hudimg,(10,10))
     screen.blit(time,(10,50))
-    atmosphere = pygame.Surface((1280,(720//2)))
+    atmosphere = pygame.Surface((1280,720))
     
     atmosphere.fill(mapStage.getAtmosphere())
     atmosphere.set_alpha((mapStage.stank))

@@ -1,3 +1,4 @@
+import math
 import random
 import pygame
 from pythonperlin import perlin
@@ -77,11 +78,18 @@ class ProceduralMap():
         pass
     
     def getAtmosphere(self):
-        self.time = (self.time + 1) % self.dayduration
-        if self.time > (self.dayduration // 2):
-            return self.nightColor
-        else:
-            return self.dayColor
+        self.time = (self.time + 1)
+        print(self.time)
+        self.daypercentage = (math.sin(self.time / self.dayduration)+1)/2
+        print(self.daypercentage)
+        self.nightpercentage = 1-self.daypercentage
+        print(self.nightpercentage)
+        newr = self.dayColor[0]*self.daypercentage + self.nightColor[0]*self.nightpercentage 
+        newg = self.dayColor[1]*self.daypercentage + self.nightColor[1]*self.nightpercentage
+        newb = self.dayColor[2]*self.daypercentage + self.nightColor[2]*self.nightpercentage
+        newatmospherecolor = (abs(newr) % 255,abs(newg) % 255,abs(newb) % 255)
+        print(newatmospherecolor)
+        return newatmospherecolor
 
     def generateGrid(self):
         gridsize = TILESIZE*20
