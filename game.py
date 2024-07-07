@@ -12,9 +12,10 @@ pygame.init()
 screen = pygame.display.set_mode((1280,720))
 clock = pygame.time.Clock()
 running = True
-
-mapStage = map_levels.ProceduralMap()
 player = player.Player() 
+mapStage = map_levels.ProceduralMap(screen)
+while (pygame.sprite.spritecollideany(player.body,mapStage.tiles)):
+    mapStage = map_levels.ProceduralMap(screen)
 entity = otherentities.Entity(50,50)
 entities = [entity]
 
@@ -33,9 +34,9 @@ while running:
     
     if keys[pygame.K_r]:
         del mapStage
-        mapStage = map_levels.ProceduralMap()
+        mapStage = map_levels.ProceduralMap(screen)
         while (pygame.sprite.spritecollideany(player.body,mapStage.tiles)):
-            mapStage = map_levels.ProceduralMap()
+            mapStage = map_levels.ProceduralMap(screen)
         
         # TILESIZE = random.randint(2,60)
     player.update(mapStage)
@@ -49,13 +50,17 @@ while running:
     # print(player.position.x,player.position.y)
     
     
-    #moving the camera 
+    # # #moving the camera 
     for tile in mapStage.tiles.sprites():
         tile.move(player.velocity.x,player.velocity.y)
     for tile in mapStage.backgroundTiles.sprites():
         tile.move(player.velocity.x,player.velocity.y)
-    for tile in mapStage.offloadedTiles.sprites():
-        tile.move(player.velocity.x,player.velocity.y)
+    for cube in mapStage.grid.sprites():
+        cube.move(player.velocity.x,player.velocity.y)
+        screen.blit(cube.image,cube.rect)
+    # mapStage.screenarea.rect.move(player.velocity.x,player.velocity.y)
+    # for tile in mapStage.offloadedTiles.sprites():
+    #     tile.move(player.velocity.x,player.velocity.y)
     for thing in entities:
         thing.move(player.velocity.x,player.velocity.y)
         screen.blit(thing.image,thing.rect)
@@ -72,17 +77,28 @@ while running:
     mapStage.draw(screen,player)
     for thing in entities:
         screen.blit(thing.image,thing.rect)
-    pygame.display.flip()
 
     hudfont = pygame.font.SysFont(None,size=50,bold=True,italic=True)
+    minortext = pygame.font.SysFont(None,size=20,italic=True)
     MapName = mapStage.name
     hudimg = hudfont.render(MapName,True,"white","black")
+    hudTime = str(mapStage.time)
+    time = minortext.render(hudTime,True,"white","black")
 
 
     screen.blit(hudimg,(10,10))
-
+    screen.blit(time,(10,50))
+    atmosphere = pygame.Surface((1280,(720//2)))
     
-    clock.tick(60*2)
+    atmosphere.fill(mapStage.getAtmosphere())
+    atmosphere.set_alpha((mapStage.stank))
+    atmosphere = pygame.transform.box_blur(atmosphere,radius=10)
+    screen.blit(atmosphere,(0,0))
+    
+    pygame.display.flip()
+    clock.tick(60)
     
     
     pass
+
+

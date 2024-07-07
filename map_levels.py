@@ -2,7 +2,7 @@ import random
 import pygame
 from pythonperlin import perlin
 from tile import *
-TILESIZE = 200
+# TILESIZE = 200
 
 
 
@@ -12,35 +12,123 @@ def randomColor():
     b = random.randint(0,255)
     color = (r,g,b)
     return color
+
+
+class Grid(pygame.sprite.Sprite):
     
+    
+    def __init__(self,image,rect):
+        super().__init__()
+        self.image = image
+        self.rect = rect
+        self.tiles = pygame.sprite.Group()
+        self.backgroundTiles = pygame.sprite.Group()
+        self.loaded = False
+    
+    def move(self,x,y):
+        self.rect.centerx += x
+        self.rect.centery += y
+        if not self.loaded:
+            for tile in self.tiles.sprites():
+                tile.move(x,y)
+            for tile in self.backgroundTiles.sprites():
+                tile.move(x,y)
+
+class ScreenReference():
+    def __init__(self,rect):
+        self.rect = rect
+            
+        pass
+
+    def move(self,x,y):
+        self.rect.centerx += x
+        self.rect.centery += y
+
+
+
+
 class ProceduralMap():
     
     
-    def __init__(self,seed = 0):
+    def __init__(self,screen,seed = 0):
         self.tiles = pygame.sprite.Group()
         self.backgroundTiles = pygame.sprite.Group()
         self.offloadedTiles = pygame.sprite.Group()
-
+        self.grid = pygame.sprite.Group()
         
+        self.size = random.randint(1,1)
+        
+        self.screenarea = ScreenReference(screen.get_rect())
+
+
         self.color1 = randomColor()
         # print(color1)
         self.color2 = randomColor()
+        
         self.generateTile(self.color1, self.color2)
-        
+        self.generateGrid()
         self.name = self.generateWorldName()
-        self.atmosphereColor = randomColor()
-        self.nightColor = randomColor()
-        self.dayduration = random.randint(10,500)
-        self.size = random.randint(100,1000)
-        
+        self.dayColor = self.color1
+        self.nightColor = self.color2
+        self.stank = random.randint(255//6,(255//2))
+        self.dayduration = random.randint(100,1000)
+        self.time = 0
+
         pass
     
+    def getAtmosphere(self):
+        self.time = (self.time + 1) % self.dayduration
+        if self.time > (self.dayduration // 2):
+            return self.nightColor
+        else:
+            return self.dayColor
+
+    def generateGrid(self):
+        gridsize = TILESIZE*20
+        # gridsize = TILESIZE*2
+        # gridsize = TILESIZE*40
+        print(gridsize)
+        gridSprites = pygame.sprite.Group()
+        
+        for x in range(0,gridsize*10,gridsize-1):
+            for y in range(0,gridsize*10,gridsize-1):
+                # print(x,y)
+                gridtile = Tile("white",gridsize)
+                gridtile.move(x-1,y-1)
+                gridSprites.add(gridtile)
+        # print(len(gridSprites.sprites()))
+        for grid in gridSprites.sprites():
+            newimage = pygame.surface.Surface((gridsize,gridsize))
+            newimage.fill("black")
+            newrect = newimage.get_rect()
+            newrect.centerx = grid.rect.centerx
+            newrect.centery = grid.rect.centery
+            newGrid = Grid(newimage,newrect)
+        # print(newGrid.rect.centerx,newGrid.rect.centery)
+            # print(len(newGrid.backgroundTiles.sprites()+newGrid.tiles.sprites()))
+            # newGrid.image = 
+            # newGrid.rect = 
+            for tile in self.offloadedTiles.sprites():
+                if newGrid.rect.colliderect(tile):
+                    if type(tile) == BackgroundTile:
+                        # lasttile = tile
+                        newGrid.backgroundTiles.add(tile)
+                        self.offloadedTiles.remove(tile)
+                    if type(tile) == Tile:
+                        # lasttile = tile
+                        newGrid.tiles.add(tile)
+                        self.offloadedTiles.remove(tile)
+            print(len(newGrid.backgroundTiles.sprites()+newGrid.tiles.sprites()))
+            self.grid.add(newGrid)
+        print(len(self.grid.sprites()))
+        pass
+
 
     def generateWorldName(self):
         firstsyl = ["end","wilt","bark","fire","fawn","aura"]
         secondsyl = ["er","or","e","a"]
         endsyl = ["ian","wood","town"]
-        sylables = random.randint(2,3)
+        sylables = random.randint(1,10)
         if sylables == 2:
             name = random.choice(firstsyl)+random.choice(endsyl)
         else:
@@ -54,7 +142,7 @@ class ProceduralMap():
         
         self.denx = 20
         self.deny = 20
-        self.dens = 6
+        self.dens = 6*self.size
         self.octaves = 3
         noise = self.generatePerlin(self.denx, self.deny, self.dens, self.octaves) 
         for row in noise:
@@ -110,20 +198,40 @@ class ProceduralMap():
     
     def updates(self,screen):
         
+        # print(screenarea)
         screenarea = screen.get_rect()
-        print(screenarea)
+        # self.tiles = pygame.sprite.Group()
+        # self.backgroundTiles = pygame.sprite.Group()
+        count = 0
+        for cube in self.grid.sprites():
+            if cube.rect.colliderect(screenarea):
+                count += 1
+                # print("collision",cube.rect.centerx,cube.rect.centery)
+                # self.tiles = grid.tiles
+                cube.loaded = True
+                self.tiles.add(cube.tiles.sprites())
+                self.backgroundTiles.add(cube.backgroundTiles.sprites())
+                # self.backgroundTiles = grid.backgroundTiles
+            else:
+                self.tiles.remove(cube.tiles)
+                cube.loaded = False
+                self.backgroundTiles.remove(cube.backgroundTiles)
+                # self.backgroundTiles = grid.backgroundTiles
+        print("count",count)
+        print("tiles",len(self.tiles.sprites()))
+        print("backgroundTiles",len(self.backgroundTiles.sprites()))
             # lasttile = self.offloadedTiles.sprites()[0]
-        for tile in self.offloadedTiles.sprites():
-            if screenarea.colliderect(tile):
-                print("Collision")
-                if type(tile) == BackgroundTile:
-                    # lasttile = tile
-                    self.backgroundTiles.add(tile)
-                    self.offloadedTiles.remove(tile)
-                if type(tile) == Tile:
-                    # lasttile = tile
-                    self.tiles.add(tile)
-                    self.offloadedTiles.remove(tile)
+        # for tile in self.offloadedTiles.sprites():
+        #     if screenarea.colliderect(tile):
+        #         print("Collision")
+        #         if type(tile) == BackgroundTile:
+        #             # lasttile = tile
+        #             self.backgroundTiles.add(tile)
+        #             self.offloadedTiles.remove(tile)
+        #         if type(tile) == Tile:
+        #             # lasttile = tile
+        #             self.tiles.add(tile)
+        #             self.offloadedTiles.remove(tile)
             # else:
             #     lastilex = lasttile.rect.centerx
             #     lastiley = lasttile.rect.centery
@@ -140,7 +248,7 @@ class ProceduralMap():
             #         self.generateTile(self.color1,self.color2,0,40)
                 
             #     pass
-        print("Offloaded: ",len(self.offloadedTiles.sprites()))
+        # print("Offloaded: ",len(self.offloadedTiles.sprites()))
         # if not screenarea.colliderect(self.globalRect):
         #     print("Outside")
         #     self.generateTile(self.color1, self.color2,0,-40)
@@ -164,7 +272,7 @@ class ProceduralMap():
         # if count < 230:
         #     self.generateTile(self.color1,self.color2,starx=0,stary=40)
             
-        print("tiles rendered:", count)
+        # print("tiles rendered:", count)
 
 
     
